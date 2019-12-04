@@ -1,7 +1,7 @@
 <?php
 /*
-	simplenews.php - BETA version
-	Nathan J. Dane, 2018.
+	simplenews.php - V1
+	Nathan J. Dane, 2019.
 	Returns a BBC News page as an array
 	
 	Layout (TBC):
