@@ -1,5 +1,6 @@
 # simplenews
 Converts a BBC News Page to an array.
+You need simple_html_dom to use this, download it here https://simplehtmldom.sourceforge.io/
 ``` 
 include "simplenews.php"
 $output=getNews("https://www.bbc.co.uk/news/uk-50879809",4)
