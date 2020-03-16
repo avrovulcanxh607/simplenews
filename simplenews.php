@@ -1,7 +1,7 @@
 <?php
 /*
-	simplenews.php - V1
-	Nathan J. Dane, 2019.
+	simplenews.php - V1.01
+	Nathan J. Dane, 2020.
 	Returns a BBC News page as an array
 	
 	Layout (TBC):
@@ -16,7 +16,8 @@
 
 function getNews($url,$limit)
 {
-	$html = file_get_html($url);	// Under NO circumstances should $html be overwritten. It's here to stay.
+	$html = file_get_contents($url);
+	$html = str_get_html($html);	// Under NO circumstances should $html be overwritten. It's here to stay.
 	if ($html===false) return false;
 	
 	$URL=$html->find("meta[property=og:url]",0);	// URL. The BBC try to hide the AV URL behind a legitamite one, 
@@ -43,24 +44,30 @@ function getNews($url,$limit)
 	$area=$area->content;
 	$area=htmlspecialchars_decode($area);
 	
-	$intro=$html->find('p[class=story-body__introduction]',0)->plaintext;	// Summary
-	$intro=htmlspecialchars_decode($intro);
+	$intro=$html->find('p[class=story-body__introduction]',0);	// Summary
+	if($intro!==false)
+		$intro=htmlspecialchars_decode($intro->plaintext);
 	
-	$paragraph='';
 	$i=0;
 	$found=false;
+	$other=false;
 	foreach ($html->find('p') as $para)
 	{
+		if (strpos($para,"<strong>"))
+		{
+			$found=true;
+			$other=true;
+		}
 		if($i<$limit && $found==true)
 		{
-			if($intro===false && $i==0)
+			if(($intro===false && $i==0) || ($other && $i==0))
 				$intro=$para->plaintext;
 			else
 				$paragraph[]=$para->plaintext;
 			$i++;
 		}
 		if (strpos($para,"introduction"))
-		$found=true;
+			$found=true;
 	}
 	
 	$stitle=fix_text($stitle);
@@ -69,6 +76,7 @@ function getNews($url,$limit)
 	$intro=fix_text($intro);
 	
 	if (!strncmp($stitle,"In pictures:",12)) return false;
+	if (!isset($paragraph)) return false;
 	if ($paragraph=='') return false;
 	if (!$paragraph) return false;
 	
